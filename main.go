@@ -18,6 +18,9 @@ type HistoryRecord struct {
 	envVars map[string]string
 }
 
+// benchmark different methods
+// create a cli wrapper around this and query the history
+
 func main() {
 
 	historyFilePath, err := determinHistoryFilePath()
@@ -28,7 +31,6 @@ func main() {
 	log.Printf("Found history path: %s\n", historyFilePath)
 
 	historyFile, err := os.Open(historyFilePath)
-
 	if err != nil {
 		log.Fatalf("Error opening file: %+v", err)
 	}
@@ -89,9 +91,17 @@ func createHistoryRecordFromLine(line string) (HistoryRecord, error) {
 	}
 
 	parsedCommand := strings.Split(sl[1], " ")
+
 	if len(parsedCommand) < 1 {
 		return HistoryRecord{},
 			errors.New(fmt.Sprintf("There is no command in line: %s", line))
+	}
+
+	// For now discarding command that start with tnev var - we can make it more
+	// generally and create a pattern for "correct" command
+	if strings.Contains(sl[1], "=") {
+		return HistoryRecord{},
+			errors.New(fmt.Sprintf("First part is not a command. skipping line: %s", line))
 	}
 
 	return HistoryRecord{
