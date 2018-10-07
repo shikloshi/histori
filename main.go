@@ -27,8 +27,9 @@ func main() {
 	log.Printf("Found history path: %s\n", historyFilePath)
 
 	historyFile, err := os.Open(historyFilePath)
+
 	if err != nil {
-		log.Fatalf("Error reading opening file: %+v", err)
+		log.Fatalf("Error opening file: %+v", err)
 	}
 
 	defer historyFile.Close()
@@ -37,7 +38,6 @@ func main() {
 	historyRecords := make([]HistoryRecord, 1000) // default to hist limit / 2 ?
 
 	for scanner.Scan() {
-
 		record, err := createHistoryRecordFromLine(scanner.Text())
 
 		if err != nil {
@@ -55,7 +55,7 @@ func main() {
 
 	cmdCounter := make(map[string]int)
 	for _, record := range historyRecords {
-		incCommandCounter(cmdCounter, record.cmdName)
+		incrementCommandCounter(cmdCounter, record.cmdName)
 	}
 
 	for key, val := range cmdCounter {
@@ -63,7 +63,7 @@ func main() {
 	}
 }
 
-func incCommandCounter(cmdCounter map[string]int, cmdName string) {
+func incrementCommandCounter(cmdCounter map[string]int, cmdName string) {
 	val, ok := cmdCounter[cmdName]
 	if !ok {
 		val = 0
