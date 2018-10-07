@@ -108,8 +108,8 @@ func determinHistoryFilePath() (string, error) {
 		return "", errors.New("Empty HOME env var, set it to point to your user home direcotry.")
 	}
 
-	defaultPath := ".zhistory" // zsh for now
-	path := fmt.Sprintf("%s/%s", home, defaultPath)
+	defaultFileName := ".zhistory" // zsh for now
+	path := fmt.Sprintf("%s/%s", home, defaultFileName)
 
 	return path, nil
 }
