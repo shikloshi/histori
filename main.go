@@ -15,6 +15,7 @@ type HistoryRecord struct {
 	args    []string
 	flags   []string
 	cmdName string
+	envVars map[string]string
 }
 
 func main() {
@@ -32,10 +33,23 @@ func main() {
 		log.Fatalf("Error opening file: %+v", err)
 	}
 
-	defer historyFile.Close()
+	historyRecords := parseHistoryFile(historyFile)
+	historyFile.Close()
+
+	cmdCounter := make(map[string]int)
+	for _, record := range historyRecords {
+		incrementCommandCounter(cmdCounter, record.cmdName)
+	}
+
+	for key, val := range cmdCounter {
+		fmt.Printf("%s : %d\n", key, val)
+	}
+}
+
+func parseHistoryFile(historyFile *os.File) []HistoryRecord {
+	historyRecords := make([]HistoryRecord, 1000) // default to hist limit?
 
 	scanner := bufio.NewScanner(historyFile)
-	historyRecords := make([]HistoryRecord, 1000) // default to hist limit / 2 ?
 
 	for scanner.Scan() {
 		record, err := createHistoryRecordFromLine(scanner.Text())
@@ -49,18 +63,12 @@ func main() {
 		historyRecords = append(historyRecords, record)
 	}
 
+	// Find a better place for this
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	cmdCounter := make(map[string]int)
-	for _, record := range historyRecords {
-		incrementCommandCounter(cmdCounter, record.cmdName)
-	}
-
-	for key, val := range cmdCounter {
-		fmt.Printf("%s : %d\n", key, val)
-	}
+	return historyRecords
 }
 
 func incrementCommandCounter(cmdCounter map[string]int, cmdName string) {
