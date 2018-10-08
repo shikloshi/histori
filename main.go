@@ -28,7 +28,7 @@ func main() {
 	}
 
 	cmdName := args[0]
-	historyRecords := buildHistoryModelFromFile() // Cache it somewhere
+	historyRecords := buildHistoryModel() // Cache it somewhere
 
 	cmdsCount := countCommands(historyRecords)
 	count := getCommandCount(cmdsCount, cmdName)
@@ -36,7 +36,7 @@ func main() {
 	log.Printf("Command: %s was executed %d times", cmdName, count)
 }
 
-func buildHistoryModelFromFile() []HistoryRecord {
+func buildHistoryModel() []HistoryRecord {
 
 	historyFilePath, err := determinHistoryFilePath()
 	if err != nil {
