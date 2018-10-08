@@ -47,7 +47,6 @@ func main() {
 	if cmdName == "all" {
 		pl := toSortedPairList(cmdsCount)
 		printAllCmd(&pl, 30) // dont do hard coded
-
 	}
 
 	count := getCommandCount(cmdsCount, cmdName)
