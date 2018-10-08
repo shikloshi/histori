@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -18,22 +19,55 @@ type HistoryRecord struct {
 	envVars map[string]string
 }
 
+type Pair struct {
+	Key   string
+	Value int
+}
+
+type PairList []Pair
+
+func (p PairList) Len() int           { return len(p) }
+func (p PairList) Less(i, j int) bool { return p[i].Value < p[j].Value }
+func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
 // benchmark different methods
 // create a cli wrapper around this and query the history
 func main() {
 
 	args := os.Args[1:]
-	if len(args) < 1 {
-		log.Fatalf("Please provide command name to count.")
+	if len(args) < 2 {
+		log.Fatalf("Please provide command and command name to count, you can also use all.")
 	}
 
-	cmdName := args[0]
+	cmdName := args[1]
+
 	historyRecords := buildHistoryModel() // Cache it somewhere
 
 	cmdsCount := countCommands(historyRecords)
+	if cmdName == "all" {
+		pl := make(PairList, len(cmdsCount))
+		i := 0
+		for k, v := range cmdsCount {
+			pl[i] = Pair{k, v}
+			i++
+		}
+
+		sort.Sort(sort.Reverse(pl))
+		printAllCmd(&pl, 30) // dont do hard coded
+
+	}
+
 	count := getCommandCount(cmdsCount, cmdName)
 
 	log.Printf("Command: %s was executed %d times", cmdName, count)
+}
+
+func printAllCmd(sortedCmdsCount *PairList, threshold int) {
+	for _, p := range *sortedCmdsCount {
+		if p.Value > thresold {
+			log.Printf("Cmd name: %s ran %d times", p.Key, p.Value)
+		}
+	}
 }
 
 func buildHistoryModel() []HistoryRecord {
