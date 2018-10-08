@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	//cobra "github.com/spf13/cobra"
 )
 
 type HistoryRecord struct {
@@ -20,8 +21,12 @@ type HistoryRecord struct {
 
 // benchmark different methods
 // create a cli wrapper around this and query the history
-
 func main() {
+	historyRecords := buildHistoryModelFromFile()
+	fmt.Println(historyRecords)
+}
+
+func buildHistoryModelFromFile() []HistoryRecord {
 
 	historyFilePath, err := determinHistoryFilePath()
 	if err != nil {
@@ -31,21 +36,29 @@ func main() {
 	log.Printf("Found history path: %s\n", historyFilePath)
 
 	historyFile, err := os.Open(historyFilePath)
+	defer historyFile.Close()
+
 	if err != nil {
 		log.Fatalf("Error opening file: %+v", err)
 	}
 
-	historyRecords := parseHistoryFile(historyFile)
-	historyFile.Close()
+	return parseHistoryFile(historyFile)
+}
 
-	cmdCounter := make(map[string]int)
+func coundCommands(historyRecords []*HistoryRecord) {
+	cmdsCounter := make(map[string]int)
 	for _, record := range historyRecords {
-		incrementCommandCounter(cmdCounter, record.cmdName)
+		incrementCommandCounter(cmdsCounter, record.cmdName)
+	}
+}
+
+func getCommandCount(cmdsCounter map[string]int, commandName string) int {
+
+	if count, ok := cmdsCounter[commandName]; ok {
+		return count
 	}
 
-	for key, val := range cmdCounter {
-		fmt.Printf("%s : %d\n", key, val)
-	}
+	return 0
 }
 
 func parseHistoryFile(historyFile *os.File) []HistoryRecord {
