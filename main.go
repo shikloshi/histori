@@ -45,14 +45,7 @@ func main() {
 
 	cmdsCount := countCommands(historyRecords)
 	if cmdName == "all" {
-		pl := make(PairList, len(cmdsCount))
-		i := 0
-		for k, v := range cmdsCount {
-			pl[i] = Pair{k, v}
-			i++
-		}
-
-		sort.Sort(sort.Reverse(pl))
+		pl := toSortedPairList(cmdsCount)
 		printAllCmd(&pl, 30) // dont do hard coded
 
 	}
@@ -60,6 +53,16 @@ func main() {
 	count := getCommandCount(cmdsCount, cmdName)
 
 	log.Printf("Command: %s was executed %d times", cmdName, count)
+}
+
+func toSortedPairList(cmdsCount map[string]int) {
+	pl := make(PairList, len(cmdsCount))
+	i := 0
+	for k, v := range cmdsCount {
+		pl[i] = Pair{k, v}
+		i++
+	}
+	sort.Sort(sort.Reverse(pl))
 }
 
 func printAllCmd(sortedCmdsCount *PairList, threshold int) {
