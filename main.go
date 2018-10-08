@@ -38,7 +38,7 @@ func main() {
 
 func buildHistoryModel() []HistoryRecord {
 
-	historyFilePath, err := determinHistoryFilePath()
+	historyFilePath, err := determineHistoryFilePath()
 	if err != nil {
 		log.Fatalf("Problem determin you history file path : %+v", err)
 	}
@@ -133,7 +133,7 @@ func createHistoryRecordFromLine(line string) (HistoryRecord, error) {
 	}, nil
 }
 
-func determinHistoryFilePath() (string, error) {
+func determineHistoryFilePath() (string, error) {
 	home := os.Getenv("HOME")
 
 	if len(home) == 0 {
