@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	//cobra "github.com/spf13/cobra"
 )
 
 type HistoryRecord struct {
@@ -22,8 +21,19 @@ type HistoryRecord struct {
 // benchmark different methods
 // create a cli wrapper around this and query the history
 func main() {
-	historyRecords := buildHistoryModelFromFile()
-	fmt.Println(historyRecords)
+
+	args := os.Args[1:]
+	if len(args) < 1 {
+		log.Fatalf("Please provide command name to count.")
+	}
+
+	cmdName := args[0]
+	historyRecords := buildHistoryModelFromFile() // Cache it somewhere
+
+	cmdsCount := countCommands(historyRecords)
+	count := getCommandCount(cmdsCount, cmdName)
+
+	log.Printf("Command: %s was executed %d times", cmdName, count)
 }
 
 func buildHistoryModelFromFile() []HistoryRecord {
@@ -45,19 +55,18 @@ func buildHistoryModelFromFile() []HistoryRecord {
 	return parseHistoryFile(historyFile)
 }
 
-func coundCommands(historyRecords []*HistoryRecord) {
+func countCommands(historyRecords []HistoryRecord) map[string]int {
 	cmdsCounter := make(map[string]int)
 	for _, record := range historyRecords {
 		incrementCommandCounter(cmdsCounter, record.cmdName)
 	}
+	return cmdsCounter
 }
 
 func getCommandCount(cmdsCounter map[string]int, commandName string) int {
-
 	if count, ok := cmdsCounter[commandName]; ok {
 		return count
 	}
-
 	return 0
 }
 
